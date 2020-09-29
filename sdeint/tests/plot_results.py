@@ -8,9 +8,9 @@ t.plot()
 
 t = Test_KP4459()
 t.plot()
-
-t = Test_KPS445()
-t.plot()
-
-t = Test_R74()
-t.plot()
+#
+# t = Test_KPS445()
+# t.plot()
+#
+# t = Test_R74()
+# t.plot()

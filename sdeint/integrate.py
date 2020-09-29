@@ -192,7 +192,7 @@ def itoSRI2(key, f, G, y0, tspan, m, Imethod=Ikpw):
       A. Roessler (2010) Runge-Kutta Methods for the Strong Approximation of
         Solutions of Stochastic Differential Equations
     """
-    return _Roessler2010_SRK2(key, f, G, y0, tspan, Imethod, m)
+    return _Roessler2010_SRK2(key, f, G, np.atleast_1d(y0), tspan, Imethod, m)
 
 
 def _Roessler2010_SRK2(key, f, G, y0, tspan, IJmethod, m):
@@ -240,7 +240,7 @@ def _Roessler2010_SRK2(key, f, G, y0, tspan, IJmethod, m):
     dWs = deltaW(key1, N - 1, m, h)  # shape (N, m)
     __, I = IJmethod(key2, dWs, h)  # shape (N, m, m)
 
-    vecG = vectorize(G, excluded=(1,), signature="(d)->(m)")
+    vecG = vectorize(G, excluded=(1,), signature="(d)->(d,m)")
 
     def body(yn, xs):
         tn, tnp1, Ik, Iij = xs
@@ -257,7 +257,7 @@ def _Roessler2010_SRK2(key, f, G, y0, tspan, IJmethod, m):
 
         ynp1 = yn + 0.5 * (fnh + fn1h) + np.dot(Gn, Ik)
 
-        ynp1 = ynp1 + 0.5 * sqrth * np.sum(vecG(H2.T, tnp1) - vecG(H3.T, tnp1), axis=0)
+        ynp1 = ynp1 + 0.5 * sqrth * np.einsum('i...i', vecG(H2.T, tnp1) - vecG(H3.T, tnp1))
 
         return ynp1, yn
 
